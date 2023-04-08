@@ -1,9 +1,13 @@
 package com.example.finalyearproject;
 
+import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -24,12 +28,17 @@ import androidx.core.content.ContextCompat;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.provider.MediaStore;
+import android.text.format.DateUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.example.finalyearproject.ui.main.SectionsPagerAdapter;
 import com.example.finalyearproject.databinding.ActivityMainBinding;
+
+import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -61,55 +70,36 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-
-        //create the notifcation
-        // Create a notification channel
-        System.out.println("here");
-        NotificationChannel channel = new NotificationChannel("channel_id", "Channel Name", NotificationManager.IMPORTANCE_HIGH);
-        channel.setDescription("Channel description");
-        channel.setLightColor(ContextCompat.getColor(this,R.color.purple_200));
-        NotificationManager notificationManager = getSystemService(NotificationManager.class);
-        notificationManager.createNotificationChannel(channel);
-
-        System.out.println("intent");
-        Intent yesIntent = new Intent("com.example.myapp.YES");
-        PendingIntent yesPendingIntent = PendingIntent.getBroadcast(this, 0, yesIntent, PendingIntent.FLAG_MUTABLE);
-
-        Intent noIntent = new Intent("com.example.myapp.NO");
-        PendingIntent noPendingIntent = PendingIntent.getBroadcast(this, 0, noIntent, PendingIntent.FLAG_MUTABLE);
+        //schedule alarm
 
 
-        System.out.println("create");
-        // Create a notification
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, "channel_id")
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setColorized(true)
-                .setColor(ContextCompat.getColor(this,R.color.purple_200))
-                .setStyle(new DecoratedMediaCustomViewStyle().setShowCancelButton(true))
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setContentTitle("Title")
-                .setContentText("Message")
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setAutoCancel(true)
-                .setTimeoutAfter(10000)
-                .addAction(com.google.android.material.R.drawable.mtrl_ic_check_mark, "Yes", yesPendingIntent)
-                .addAction(com.google.android.material.R.drawable.mtrl_ic_cancel, "No", noPendingIntent);
+        // Set the time to trigger the alarm (e.g., 6 pm every day)
+        Calendar calendar = Calendar.getInstance();
+        //calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.add(Calendar.SECOND, 2);
 
-        System.out.println("show");
-        // Show the notification
-        //NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 1);
-            return;
-        }
-        notificationManager.notify(1, builder.build());
+        // Create a pending intent to trigger the service
+        Intent intent = new Intent(this, NotifyReceiver.class);
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+
+        // Get the alarm manager and schedule the periodic alarm
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),pendingIntent);
+
+       //alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+         //AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);
 
 
-        // Start the foreground service with the notification
-        Intent serviceIntent = new Intent(this, MyForegroundService.class);
-        serviceIntent.putExtra("notification_id", 1);
-        serviceIntent.putExtra("notification", builder.build());
-        ContextCompat.startForegroundService(this, serviceIntent);
+
+
+
+        // Set a window of 2 hours (2pm to 4pm)
+        //long lasttime=2 * 60 * 60 * 1000;
+        //alarmManager.setWindow(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),lasttime, pendingIntent);
+        Toast.makeText(this, "Starting Service Alarm", Toast.LENGTH_LONG).show();
+
+
 
         System.out.println("here");
 
