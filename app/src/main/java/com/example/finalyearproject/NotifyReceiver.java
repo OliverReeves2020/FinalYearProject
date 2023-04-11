@@ -10,13 +10,14 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.widget.Toast;
 
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 
 public class NotifyReceiver extends BroadcastReceiver {
 
-    @SuppressLint("MissingPermission")
+
     @Override
     public void onReceive(Context context, Intent intent) {
 
@@ -24,51 +25,50 @@ public class NotifyReceiver extends BroadcastReceiver {
         //configure notification
         //build notification
 
-
-
-
-
-        // TODO: This method is called when the BroadcastReceiver is receiving
-        // an Intent broadcast.
-        //Toast.makeText(this, "MyAlarmService.onStart()", Toast.LENGTH_LONG).show();
-        NotificationChannel channel = new NotificationChannel("channel_id", "Channel Name", NotificationManager.IMPORTANCE_HIGH);
-        channel.setDescription("Channel description");
-        channel.setLightColor(ContextCompat.getColor(context,R.color.purple_200));
+        //create channel
+        NotificationChannel channel = new NotificationChannel("channel_id", "Reminder", NotificationManager.IMPORTANCE_HIGH);
+        channel.setDescription("the following notifications are used to motivate you and are essential functionality");
+        channel.setLightColor(ContextCompat.getColor(context, R.color.purple_200));
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
         notificationManager.createNotificationChannel(channel);
 
-        // Create a pending intent to handle the Yes and No actions
-        Intent yesIntent = new Intent(context,MyBroadcastReceiver.class);
-        yesIntent.setAction("com.example.myapp.YES");
+        // Create a pending intent to handle the Yes
+        Intent yesIntent = new Intent(context, MyBroadcastReceiver.class);
+        yesIntent.setAction("yes");
         PendingIntent yesPendingIntent = PendingIntent.getBroadcast(context, 0, yesIntent, PendingIntent.FLAG_MUTABLE);
 
-        Intent noIntent = new Intent(context,MyBroadcastReceiver.class);
-        noIntent.setAction("com.example.myapp.YES");
+        //and Remind me later actions
+        Intent noIntent = new Intent(context, MyBroadcastReceiver.class);
+        noIntent.setAction("remind");
         PendingIntent noPendingIntent = PendingIntent.getBroadcast(context, 0, noIntent, PendingIntent.FLAG_MUTABLE);
+
+        //when user dissmisses this will be called
+        Intent delIntent = new Intent(context, MyBroadcastReceiver.class);
+        delIntent.setAction("del");
+        PendingIntent delPendingIntent = PendingIntent.getBroadcast(context, 0, delIntent, PendingIntent.FLAG_MUTABLE);
 
 
         // Create the notification with a Yes or No question
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "channel_id")
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setColorized(true)
-                .setColor(ContextCompat.getColor(context,R.color.purple_200))
-                .setStyle(new androidx.media.app.NotificationCompat.DecoratedMediaCustomViewStyle().setShowCancelButton(true))
+                .setColor(ContextCompat.getColor(context, R.color.purple_200))
+                .setStyle(new NotificationCompat.BigTextStyle())
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentTitle("REcieveder")
                 .setContentText("Message")
                 .setAutoCancel(false)
+                .setDeleteIntent(delPendingIntent)
                 .addAction(com.google.android.material.R.drawable.mtrl_ic_check_mark, "Yes", yesPendingIntent)
-                .addAction(com.google.android.material.R.drawable.mtrl_ic_cancel, "No", noPendingIntent);
+                .addAction(com.google.android.material.R.drawable.mtrl_ic_cancel, "Maybe Later", noPendingIntent);
 
-        if (ContextCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS)
-                == PackageManager.PERMISSION_GRANTED) {
-            notificationManager.notify(1, builder.build());
+        assert (ContextCompat.checkSelfPermission(context, android.Manifest.permission.POST_NOTIFICATIONS)
+                == PackageManager.PERMISSION_GRANTED);
+        notificationManager.notify(1, builder.build());
             // Permission is granted, perform the operation
             // ...
-        } else {
-            // Permission is not granted, request it from the user
-
-        }
 
     }
+
+
 }

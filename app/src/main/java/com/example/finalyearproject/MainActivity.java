@@ -1,42 +1,27 @@
 package com.example.finalyearproject;
 
 import android.app.AlarmManager;
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.os.Build;
+import android.content.SharedPreferences;
+import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 
-import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
-import androidx.core.app.NotificationCompat;
-import androidx.media.app.NotificationCompat.DecoratedMediaCustomViewStyle;
-
-import androidx.core.content.ContextCompat;
+import androidx.preference.PreferenceManager;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.provider.MediaStore;
-import android.text.format.DateUtils;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
 import com.example.finalyearproject.ui.main.SectionsPagerAdapter;
 import com.example.finalyearproject.databinding.ActivityMainBinding;
+
 
 import java.util.Calendar;
 
@@ -55,16 +40,32 @@ public class MainActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
+        //get bindings view pager of main and set adapter to it
         ViewPager viewPager = binding.viewPager;
         viewPager.setAdapter(sectionsPagerAdapter);
         TabLayout tabs = binding.tabs;
         tabs.setupWithViewPager(viewPager);
-        FloatingActionButton fab = binding.fab;
 
+        // Set tab titles
+        final int[] TAB_TITLES = new int[] {R.string.tab_text_1, R.string.tab_text_2};
+        for (int i = 0; i < TAB_TITLES.length; i++) {
+            tabs.getTabAt(i).setText(TAB_TITLES[i]);
+        }
+
+        //start background animation purely aesthetics
+        AnimationDrawable animationDrawable = (AnimationDrawable) viewPager.getBackground();
+        animationDrawable.setEnterFadeDuration(2500);
+        animationDrawable.setExitFadeDuration(5000);
+        animationDrawable.start();
+        FloatingActionButton fab = binding.fab;
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences UserStats = this.getSharedPreferences("UserStats", Context.MODE_PRIVATE);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+
+
+                Snackbar.make(view, String.valueOf((UserStats.getInt("dailyAmount",0))), Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
         });
@@ -104,6 +105,7 @@ public class MainActivity extends AppCompatActivity {
         System.out.println("here");
 
     }
+
 
 
 }

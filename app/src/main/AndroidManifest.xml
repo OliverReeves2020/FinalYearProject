@@ -20,7 +20,7 @@
         <receiver
             android:name=".NotifyReceiver"
             android:enabled="true"
-            android:exported="true"></receiver>
+            android:exported="true" />
 
         <activity
             android:name=".MainActivity"
@@ -34,7 +34,7 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".MyBroadcastReceiver"></receiver>
+        <receiver android:name=".MyBroadcastReceiver" />
     </application>
 
 </manifest>
