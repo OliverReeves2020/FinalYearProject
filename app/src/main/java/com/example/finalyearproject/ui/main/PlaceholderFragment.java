@@ -2,10 +2,15 @@ package com.example.finalyearproject.ui.main;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.RenderEffect;
+import android.graphics.Shader;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,6 +24,8 @@ import androidx.preference.PreferenceManager;
 
 import com.example.finalyearproject.R;
 import com.example.finalyearproject.databinding.FragmentMainBinding;
+
+import jp.wasabeef.blurry.Blurry;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -101,6 +108,26 @@ public class PlaceholderFragment extends Fragment implements SharedPreferences.O
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        FrameLayout frameLayout = view.findViewById(R.id.blur);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            frameLayout.setRenderEffect(RenderEffect.createBlurEffect(10,10, Shader.TileMode.DECAL));
+            frameLayout.setOutlineAmbientShadowColor(Color.argb(40,00,00,00));
+        }
+        else{System.out.println("not compat");}
+
+
+        //Blurry.with(requireContext())
+        //            .radius(10)
+        //            .sampling(8)
+        //            .color(Color.argb(66, 255, 255, 255))
+        //            .async()
+        //            .animate(500)
+        //            .onto(view.findViewById(R.id.ChartArea));
+
+
+
+
+
 
         SharedPreferences sharedPreferences= requireContext().getSharedPreferences("UserStats", Context.MODE_PRIVATE);
         ProgressBar progressBar;
@@ -108,7 +135,7 @@ public class PlaceholderFragment extends Fragment implements SharedPreferences.O
         TextView textView;
 
         //set main goal
-        int totalDays=sharedPreferences.getInt("totalDays", 7);
+        int totalDays=sharedPreferences.getInt("totalDays", 0);
         int maxDays=getNextMultipleOfSeven(totalDays);
         //get current main goal progress bar
         progressBar = view.findViewById(R.id.MainGoal);

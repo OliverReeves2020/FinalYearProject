@@ -1,0 +1,13 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <!-- Background color with transparency -->
+    <solid android:color="#80ADACAC" />
+
+    <!-- Rounded corners for the background -->
+    <corners android:radius="16dp" />
+
+    <!-- Gradient color for the shadow -->
+
+
+</shape>

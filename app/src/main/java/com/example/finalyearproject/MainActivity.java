@@ -5,33 +5,50 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.AnimationDrawable;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 
+import androidx.core.app.ActivityCompat;
 import androidx.preference.PreferenceManager;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
+import android.widget.ImageSwitcher;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.finalyearproject.ui.main.SectionsPagerAdapter;
 import com.example.finalyearproject.databinding.ActivityMainBinding;
 
 
+import java.lang.annotation.Annotation;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Target;
 import java.util.Calendar;
+import java.util.concurrent.CompletableFuture;
+
+import jp.wasabeef.blurry.Blurry;
+
 
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
 
 
         super.onCreate(savedInstanceState);
@@ -71,6 +88,11 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+
+        //findViewById(R.id.ChartArea).setBackground(new BitmapDrawable(getResources(), blurredBitmap));
+
+
+
         //schedule alarm
 
 
@@ -105,6 +127,7 @@ public class MainActivity extends AppCompatActivity {
         System.out.println("here");
 
     }
+
 
 
 

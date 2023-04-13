@@ -2,8 +2,17 @@
 <animation-list xmlns:android="http://schemas.android.com/apk/res/android">
 <item
     android:drawable="@drawable/background_one"
-    android:duration="5000"/>
+    android:duration="7000"/>
     <item
         android:drawable="@drawable/background_two"
-        android:duration="5000"/>
+        android:duration="7000"/>
+    <item
+        android:drawable="@drawable/background_three"
+        android:duration="7000"/>
+    <item
+        android:drawable="@drawable/background_four"
+        android:duration="7000"/>
+    <item
+        android:drawable="@drawable/background_five"
+        android:duration="7000"/>
 </animation-list>
