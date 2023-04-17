@@ -2,7 +2,7 @@
     android:shape="rectangle">
 
     <!-- Background color with transparency -->
-    <solid android:color="#B3FFFFFF" />
+    <solid android:color="#B3494747" />
 
     <!-- Rounded corners for the background -->
     <corners android:radius="16dp" />
@@ -10,9 +10,9 @@
     <!-- Gradient color for the shadow -->
     <gradient
         android:angle="90"
-        android:endColor="#F6F6F6"
-        android:startColor="#B3FFFFFF"
+        android:endColor="#616161"
+        android:startColor="#80616161"
         />
-    <stroke android:width="1.5dp" android:color="#D5D3D3"/>
+    <stroke android:width="1.5dp" android:color="@android:color/darker_gray"/>
 
 </shape>

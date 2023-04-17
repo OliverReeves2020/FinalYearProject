@@ -1,29 +1,176 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/constraintLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".Settings">
 
-    <TextView
-        android:id="@+id/textView"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Hello" />
+        tools:layout_editor_absoluteX="1dp"
+        tools:layout_editor_absoluteY="1dp">
 
-    <Button
-        android:id="@+id/button4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="600dp"
-        android:layout_marginBottom="32dp"
-        android:text="Hello"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="1.0"
-        tools:layout_editor_absoluteX="16dp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:layout_marginTop="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="notifcation options"
+                android:layout_marginLeft="20dp"/>
+        <LinearLayout
+            android:id="@+id/notificationSettings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            style="@style/glassbg">
+
+            <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                >
+
+                <TextView
+                    android:id="@+id/freqPickerText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Frequnecy Picker"
+                    android:layout_margin="10dp"/>
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center|left"
+                    android:layout_marginStart="10dp">
+
+                    <TextView
+                        android:id="@+id/daytextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="TextView" />
+                    <View
+                        android:layout_height="20dp"
+                        android:layout_width="2dp"
+                        style="@style/lineSeperatorColour"
+                        android:layout_margin="5dp"/>
+                    <Button
+                        android:id="@+id/dayPickerButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Button" />
+                </TableRow>
+            </TableLayout>
+
+            <View
+                android:layout_height="2dp"
+                android:layout_width="match_parent"
+                style="@style/lineSeperatorColour"
+                android:layout_margin="10dp"
+                />
+            <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center|left"
+                    android:layout_marginStart="10dp"
+                    android:text="TimePicker"
+                    android:textSize="20sp" />
+
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center|left"
+                    android:layout_marginStart="10dp">
+
+                    <TextView
+                        android:id="@+id/timePickerTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="TextView"
+                        android:textSize="16sp"
+                        android:layout_gravity="center"
+                        android:layout_marginRight="2dp"/>
+                    <View
+                        android:layout_height="20dp"
+                        android:layout_width="2dp"
+                        style="@style/lineSeperatorColour"
+                        android:layout_margin="5dp"/>
+                    <Button
+                        android:id="@+id/timePickerButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical|end"
+
+                        android:padding="2dp"
+                        android:text="change time"
+                        android:textSize="14sp"/>
+
+                </TableRow>
+
+
+            </TableLayout>
+
+
+            <View
+                android:layout_height="2dp"
+                android:layout_width="match_parent"
+                style="@style/lineSeperatorColour"
+                android:layout_margin="10dp"
+                />
+            <TableLayout
+                android:id="@+id/NotifactionTypeLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/notifyText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center|left"
+                    android:layout_marginStart="10dp"
+                    android:text="Type"
+                    android:textSize="20sp" />
+
+
+                <TableRow
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center|left"
+                    android:layout_marginStart="10dp"
+                    >
+
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/checkBoxVibration"
+                        android:layout_width="wrap_content"
+                        android:layout_height="48dp"
+                        android:text="Silent"/>
+
+
+                </TableRow>
+
+            </TableLayout>
+
+
+        </LinearLayout></LinearLayout>
+    </ScrollView>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

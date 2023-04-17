@@ -1,4 +1,4 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <!-- Base application theme. -->
     <style name="Theme.FinalYearProject" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
         <!-- Primary brand color. -->
@@ -12,6 +12,32 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
+    </style>
+
+    <style name="lineSeperatorColour">
+        <item name="android:background">@color/black</item>
+    </style>
+
+    <style name="grad">
+        <item name="android:background">@drawable/backgroundlist</item>
+    </style>
+
+
+    <style name="glassbg">
+        <item name="android:background">@drawable/bg_glassmorphism</item>
+        <item name="android:layout_marginStart">10dp</item>
+        <item name="android:layout_marginEnd">10dp</item>
+        <item name="android:layout_marginBottom">10dp</item>
+    </style>
+
+    <style name="progressbar" parent="android:Widget.Holo.Light.ProgressBar.Horizontal">
+        <item name="android:progressTint">@color/purple_200</item>
+    </style>
+
+
+    <style name="progressbarcircle" parent="Widget.MaterialComponents.CircularProgressIndicator">
+        <item name="trackColor">@color/white</item>
+        <item name="indicatorColor">@color/black</item>
     </style>
 
     <style name="Theme.FinalYearProject.NoActionBar">

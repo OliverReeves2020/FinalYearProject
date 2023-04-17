@@ -2,44 +2,29 @@ package com.example.finalyearproject;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.drawable.AnimationDrawable;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceManager;
+import androidx.viewpager.widget.ViewPager;
+
+import com.example.finalyearproject.databinding.ActivityMainBinding;
+import com.example.finalyearproject.jobs.DailyUpdate;
+import com.example.finalyearproject.ui.main.SectionsPagerAdapter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 
-import androidx.core.app.ActivityCompat;
-import androidx.preference.PreferenceManager;
-import androidx.viewpager.widget.ViewPager;
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.FrameLayout;
-import android.widget.ImageSwitcher;
-import android.widget.ImageView;
-import android.widget.Toast;
-
-import com.example.finalyearproject.ui.main.SectionsPagerAdapter;
-import com.example.finalyearproject.databinding.ActivityMainBinding;
-
-
-import java.lang.annotation.Annotation;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Target;
 import java.util.Calendar;
-import java.util.concurrent.CompletableFuture;
-
-import jp.wasabeef.blurry.Blurry;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -81,19 +66,17 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-
-                Snackbar.make(view, String.valueOf((UserStats.getInt("dailyAmount",0))), Snackbar.LENGTH_LONG)
+                Snackbar.make(view, "recorded activity, well done!", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+
+                Intent intent = new Intent(view.getContext(),MyBroadcastReceiver.class);
+                intent.setAction("yes");
+                view.getContext().sendBroadcast(intent);
+
             }
         });
 
 
-
-        //findViewById(R.id.ChartArea).setBackground(new BitmapDrawable(getResources(), blurredBitmap));
-
-
-
-        //schedule alarm
 
 
         // Set the time to trigger the alarm (e.g., 6 pm every day)
@@ -116,7 +99,6 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-
         // Set a window of 2 hours (2pm to 4pm)
         //long lasttime=2 * 60 * 60 * 1000;
         //alarmManager.setWindow(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),lasttime, pendingIntent);
@@ -124,9 +106,44 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+        scheduleJob();
+
+
+
+
+
         System.out.println("here");
 
     }
+
+    private void scheduleJob() {
+        JobScheduler jobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        ComponentName componentName = new ComponentName(this, DailyUpdate.class);
+
+        // Set the conditions under which the job should run.
+        //JobInfo jobInfo = new JobInfo.Builder(1, componentName)
+        //        .setRequiresCharging(true)
+        //        .setRequiresDeviceIdle(true)
+        //        .setPeriodic(AlarmManager.INTERVAL_DAY)
+        //        .setPersisted(true)
+        //        .build();
+
+        // Set the conditions under which the job should run.
+        JobInfo jobInfo = new JobInfo.Builder(1, componentName)
+                .setMinimumLatency(100)
+                .setPersisted(true)
+                .build();
+
+
+        // Schedule the job.
+        int resultCode = jobScheduler.schedule(jobInfo);
+        if (resultCode == JobScheduler.RESULT_SUCCESS) {
+            Toast.makeText(this, "job completed", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "job failed",Toast.LENGTH_SHORT).show();
+        }
+    }
+
 
 
 

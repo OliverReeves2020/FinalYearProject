@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:drawable="@drawable/nightbackground_one"
+        android:duration="7000"/>
+    <item android:duration="7000">
+        <shape>
+            <gradient
+                android:angle="45"
+                android:startColor="#801AFF00"
+                android:endColor="#333399"
+                />
+        </shape>
+    </item>
+    <item android:duration="7000">
+        <shape>
+            <gradient
+                android:angle="45"
+                android:startColor="#8000FFA6"
+                android:endColor="#333399"
+                />
+        </shape>
+    </item>
+    <item android:duration="7000">
+        <shape>
+            <gradient
+                android:angle="45"
+                android:startColor="#80FF0059"
+                android:endColor="#333399"
+                />
+        </shape>
+    </item>
+
+</animation-list>

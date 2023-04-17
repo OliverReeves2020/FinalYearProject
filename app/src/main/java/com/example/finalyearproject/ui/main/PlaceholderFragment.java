@@ -5,27 +5,26 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.RenderEffect;
 import android.graphics.Shader;
+import android.graphics.drawable.AnimationDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.preference.PreferenceManager;
 
 import com.example.finalyearproject.R;
 import com.example.finalyearproject.databinding.FragmentMainBinding;
 
-import jp.wasabeef.blurry.Blurry;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -80,6 +79,10 @@ public class PlaceholderFragment extends Fragment implements SharedPreferences.O
 
         // Register the listener with the shared preferences
         sharedPreferences.registerOnSharedPreferenceChangeListener(preferenceChangeListener);
+
+
+
+
     }
 
     @Override
@@ -92,74 +95,66 @@ public class PlaceholderFragment extends Fragment implements SharedPreferences.O
 
 
         binding = FragmentMainBinding.inflate(inflater, container, false);
-        View root = binding.getRoot();
-
-        final TextView textView = binding.sectionLabel;
-        pageViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
-            }
-        });
-        return root;
+        return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        FrameLayout frameLayout = view.findViewById(R.id.blur);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            frameLayout.setRenderEffect(RenderEffect.createBlurEffect(10,10, Shader.TileMode.DECAL));
-            frameLayout.setOutlineAmbientShadowColor(Color.argb(40,00,00,00));
-        }
-        else{System.out.println("not compat");}
+
+       //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+       //    view.findViewWithTag("blur").setRenderEffect(RenderEffect.createBlurEffect(20,20, Shader.TileMode.DECAL));
+       //    view.findViewWithTag("blur").setOutlineAmbientShadowColor(Color.argb(40,00,00,00));
+       //}
 
 
-        //Blurry.with(requireContext())
-        //            .radius(10)
-        //            .sampling(8)
-        //            .color(Color.argb(66, 255, 255, 255))
-        //            .async()
-        //            .animate(500)
-        //            .onto(view.findViewById(R.id.ChartArea));
+        updatebar(view);
 
 
 
 
 
 
+
+    }
+
+    private void updatebar(@NonNull View view) {
         SharedPreferences sharedPreferences= requireContext().getSharedPreferences("UserStats", Context.MODE_PRIVATE);
         ProgressBar progressBar;
-        int progress;
+
         TextView textView;
 
         //set main goal
         int totalDays=sharedPreferences.getInt("totalDays", 0);
-        int maxDays=getNextMultipleOfSeven(totalDays);
-        //get current main goal progress bar
-        progressBar = view.findViewById(R.id.MainGoal);
-        //set the max to next 7 multiple based on total days
-        progressBar.setMax(maxDays);
-        //set the current bar to total days
-        setbar(view,progressBar,"totalDays");
-        //set current text to total days
-        textView=view.findViewById(R.id.CurrentProgressText);
-        String s= totalDays +" Days";
-        textView.setText(s);
-        //set the aim text to next 7th
-        textView=view.findViewById(R.id.GoalProgressText);
-        s= maxDays +" Days";
-        textView.setText(s);
+        TextView txt=view.findViewById(R.id.CurrentProgressText);
+        if(txt.getText().toString().equals(totalDays + " Days")||txt.getText().equals("")) {
+            int maxDays = getNextMultipleOfSeven(totalDays);
+            //get current main goal progress bar
+            progressBar = view.findViewById(R.id.MainGoal);
+            //set the max to next 7 multiple based on total days
+            progressBar.setMax(maxDays);
+            //set the current bar to total days
+            setbar(view, progressBar, "totalDays");
+            //set current text to total days
+            textView = view.findViewById(R.id.CurrentProgressText);
+            String s = totalDays + " Days";
+            textView.setText(s);
+            //set the aim text to next 7th
+            textView = view.findViewById(R.id.GoalProgressText);
+            s = maxDays + " Days";
+            textView.setText(s);
+        }
 
 
         //set progress bar
         progressBar = view.findViewById(R.id.progressBar2);
         setbar(view,progressBar,"dailyAmount");
 
-
-
-
+        //set streak bar
+        progressBar = view.findViewById(R.id.streakProgressBar);
+        setbarmax(view,progressBar,"highestStreak","currentStreak");
+        setbar(view,progressBar,"currentStreak");
 
     }
 
@@ -173,15 +168,25 @@ public class PlaceholderFragment extends Fragment implements SharedPreferences.O
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-            Toast.makeText(requireContext(),"change",Toast.LENGTH_SHORT);
+
             if (key.equals("UserStats")) {
                 //SharedPreferences UserStats = context.getSharedPreferences("UserStats", Context.MODE_PRIVATE);
                 // Update the progress bar with the new value
-                Toast.makeText(requireContext(),"works",Toast.LENGTH_SHORT);
-                ProgressBar progressBar = getView().findViewById(R.id.progressBar2);
-                int progress = sharedPreferences.getInt("dailyAmount", 0);
-                progressBar.setProgress(progress);
+                updatebar(requireView());
 
+
+            }
+            //if current streak is greater than highest streak or equal but not 0
+            if(key.equals("currentStreak")){
+                if((sharedPreferences.getInt("highestStreak",0)<=sharedPreferences.getInt("currentStreak",0))
+                        &&sharedPreferences.getInt("currentStreak",0)>0){
+                    requireView().findViewById(R.id.streakicon).setVisibility(View.VISIBLE);
+
+                    AnimationDrawable animationDrawable = (AnimationDrawable) requireView().findViewById(R.id.streakicon).getBackground();
+                    animationDrawable.setEnterFadeDuration(2500);
+                    animationDrawable.setExitFadeDuration(5000);
+                    animationDrawable.start();
+                }
             }
 
     }
@@ -192,6 +197,18 @@ public class PlaceholderFragment extends Fragment implements SharedPreferences.O
         SharedPreferences sharedPreferences= requireContext().getSharedPreferences("UserStats", Context.MODE_PRIVATE);
         int progress = sharedPreferences.getInt(key, 0);
         progressBar.setProgress(progress);
+    }
+    private void setbarmax(View view,ProgressBar progressBar, String key,String backup){
+
+        SharedPreferences sharedPreferences= requireContext().getSharedPreferences("UserStats", Context.MODE_PRIVATE);
+        int progress = sharedPreferences.getInt(key, 0);
+        if (progress==0){
+            progressBar.setMax(sharedPreferences.getInt(backup, 1));
+        }
+        else{
+            progressBar.setMax(progress);
+        }
+
     }
     private void setTxt(View view,TextView textView, String key){
         SharedPreferences sharedPreferences= requireContext().getSharedPreferences("UserStats", Context.MODE_PRIVATE);
@@ -212,6 +229,8 @@ public class PlaceholderFragment extends Fragment implements SharedPreferences.O
             return x + 7 - remainder;
         }
     }
+
+
 
 
 }

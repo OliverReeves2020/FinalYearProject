@@ -1,23 +1,24 @@
 package com.example.finalyearproject;
 
+import static android.content.Context.ALARM_SERVICE;
+
+import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.widget.Toast;
 
-import androidx.core.app.ActivityCompat;
-import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
-import androidx.core.content.ContextCompat;
 
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 public class MyBroadcastReceiver extends BroadcastReceiver {
 
@@ -36,6 +37,7 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
                 SharedPreferences.Editor UserStatsEditor = UserStats.edit();
                 int totalDays = UserStats.getInt("totalDays",0);
                 int currentStreak = UserStats.getInt("currentStreak",0);
+                int HighestStreak = UserStats.getInt("highestStreak",0);
                 int dailyAmount = UserStats.getInt("dailyAmount",0);
                 String lastDate = UserStats.getString("lastDate",null);
 
@@ -61,10 +63,33 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
                 }
                 //else if date is later/newer
                 else if(currentDate.compareTo(dateFormat.parse(lastDate))>0){
-                    UserStatsEditor.putInt("dailyAmount",1);
-                    UserStatsEditor.putInt("totalDays",1+totalDays);
-                    UserStatsEditor.putInt("currentStreak",1+currentStreak);
-                    UserStatsEditor.putString("lastDate",currentDateString);
+
+
+
+                    long diffInMillies = Math.abs(currentDate.getTime() - dateFormat.parse(lastDate).getTime());
+                    long diffInDays = TimeUnit.DAYS.convert(diffInMillies, TimeUnit.MILLISECONDS);
+
+                    //if streak is broken
+                    if (diffInDays >= 2) {
+                        UserStatsEditor.putInt("dailyAmount",1);
+                        UserStatsEditor.putInt("totalDays",1+totalDays);
+                        UserStatsEditor.putInt("currentStreak",1);
+                        UserStatsEditor.putString("lastDate",currentDateString);
+
+
+                    } //else streak continues
+                    else {
+                        UserStatsEditor.putInt("dailyAmount",1);
+                        UserStatsEditor.putInt("totalDays",1+totalDays);
+                        UserStatsEditor.putInt("currentStreak",1+currentStreak);
+                        UserStatsEditor.putString("lastDate",currentDateString);
+                    }
+                    //if current streak is greater than highest recorde add
+                    if(currentStreak>HighestStreak){
+                        UserStatsEditor.putInt("HighestStreak",currentStreak);
+                    }
+
+
                 }
 
 
@@ -86,7 +111,15 @@ public class MyBroadcastReceiver extends BroadcastReceiver {
             //close current notifcation
         else if (intent.getAction().equals("remind")) {
 
-            Toast.makeText(context, "will remind you later", Toast.LENGTH_LONG).show();
+            //schedule another notification for 30mins
+            Calendar calendar = Calendar.getInstance();
+            calendar.add(Calendar.MINUTE, 30);
+            Intent newintent = new Intent(context, NotifyReceiver.class);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, newintent, PendingIntent.FLAG_IMMUTABLE);
+            AlarmManager alarmManager = (AlarmManager)  context.getSystemService(ALARM_SERVICE);
+            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),pendingIntent);
+
+            //cancel current notifcation
             NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
             notificationManager.cancel(1);
         }
