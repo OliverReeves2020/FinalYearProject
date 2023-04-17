@@ -74,6 +74,7 @@ public class PlaceholderFragment extends Fragment implements SharedPreferences.O
                 int progress = sharedPreferences.getInt("dailyAmount", 0);
                 progressBar.setProgress(progress);
 
+                setStreakIconandText();
             }
         };
 
@@ -107,8 +108,7 @@ public class PlaceholderFragment extends Fragment implements SharedPreferences.O
        //    view.findViewWithTag("blur").setRenderEffect(RenderEffect.createBlurEffect(20,20, Shader.TileMode.DECAL));
        //    view.findViewWithTag("blur").setOutlineAmbientShadowColor(Color.argb(40,00,00,00));
        //}
-
-
+        setStreakIconandText();
         updatebar(view);
 
 
@@ -117,6 +117,17 @@ public class PlaceholderFragment extends Fragment implements SharedPreferences.O
 
 
 
+    }
+
+    private void setStreakIconandText() {
+        SharedPreferences sharedPreferences1 =requireContext().getSharedPreferences("UserStats",Context.MODE_PRIVATE);
+        if((sharedPreferences1.getInt("highestStreak",0)<=sharedPreferences1.getInt("currentStreak",0))
+                &&sharedPreferences1.getInt("currentStreak",0)>0){
+            System.out.println("-->--");
+            requireView().findViewById(R.id.streakicon).setVisibility(View.VISIBLE);
+
+        }
+        else{requireView().findViewById(R.id.streakicon).setVisibility(View.INVISIBLE);}
     }
 
     private void updatebar(@NonNull View view) {
@@ -168,25 +179,22 @@ public class PlaceholderFragment extends Fragment implements SharedPreferences.O
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-
+        System.out.println("xxxxx"+key);
             if (key.equals("UserStats")) {
                 //SharedPreferences UserStats = context.getSharedPreferences("UserStats", Context.MODE_PRIVATE);
                 // Update the progress bar with the new value
+                System.out.println("xxxxx");
                 updatebar(requireView());
+                SharedPreferences sharedPref= requireContext().getSharedPreferences("UserStats", Context.MODE_PRIVATE);
 
-
-            }
-            //if current streak is greater than highest streak or equal but not 0
-            if(key.equals("currentStreak")){
+                System.out.println("-->--"+sharedPref.getInt("highestStreak",0)+sharedPreferences.getInt("currentStreak",0));
                 if((sharedPreferences.getInt("highestStreak",0)<=sharedPreferences.getInt("currentStreak",0))
                         &&sharedPreferences.getInt("currentStreak",0)>0){
+                    System.out.println("-->--");
                     requireView().findViewById(R.id.streakicon).setVisibility(View.VISIBLE);
 
-                    AnimationDrawable animationDrawable = (AnimationDrawable) requireView().findViewById(R.id.streakicon).getBackground();
-                    animationDrawable.setEnterFadeDuration(2500);
-                    animationDrawable.setExitFadeDuration(5000);
-                    animationDrawable.start();
                 }
+
             }
 
     }

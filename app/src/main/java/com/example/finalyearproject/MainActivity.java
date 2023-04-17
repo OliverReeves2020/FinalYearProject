@@ -1,6 +1,7 @@
 package com.example.finalyearproject;
 
 import android.app.AlarmManager;
+import android.app.Dialog;
 import android.app.PendingIntent;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
@@ -11,6 +12,7 @@ import android.content.SharedPreferences;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -38,6 +40,30 @@ public class MainActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
 
+
+        SharedPreferences pref = getSharedPreferences("startup", MODE_PRIVATE);
+        if (pref.getString("start", "false").equals("false")) {
+
+        Dialog onboardingDialog = new Dialog(this);
+        onboardingDialog.setContentView(R.layout.dialog_onboarding);
+        onboardingDialog.show();
+        Button btnNext = onboardingDialog.findViewById(R.id.btn_next);
+        btnNext.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                pref.edit().putString("start", "true").apply();
+                onboardingDialog.dismiss();
+
+
+                // Proceed to the next step
+            }
+        });
+
+    }
+
+
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
@@ -60,8 +86,8 @@ public class MainActivity extends AppCompatActivity {
         animationDrawable.setExitFadeDuration(5000);
         animationDrawable.start();
         FloatingActionButton fab = binding.fab;
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        SharedPreferences UserStats = this.getSharedPreferences("UserStats", Context.MODE_PRIVATE);
+        //SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        //SharedPreferences UserStats = this.getSharedPreferences("UserStats", Context.MODE_PRIVATE);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

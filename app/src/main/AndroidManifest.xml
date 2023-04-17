@@ -18,9 +18,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FinalYearProject"
         tools:targetApi="31">
+
+
         <service
             android:name=".jobs.DailyUpdate"
-            android:permission="android.permission.BIND_JOB_SERVICE"></service>
+            android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <receiver
             android:name=".NotifyReceiver"
