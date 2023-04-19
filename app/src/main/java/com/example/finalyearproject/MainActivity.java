@@ -19,13 +19,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
 import androidx.viewpager.widget.ViewPager;
 
+import com.example.finalyearproject.database.PromptEvaluator;
 import com.example.finalyearproject.databinding.ActivityMainBinding;
+import com.example.finalyearproject.functions.AchievementEdit;
+import com.example.finalyearproject.functions.Alarmsandnotifcation;
 import com.example.finalyearproject.jobs.DailyUpdate;
 import com.example.finalyearproject.ui.main.SectionsPagerAdapter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.tabs.TabLayout;
 
+import java.io.IOException;
 import java.util.Calendar;
 
 
@@ -43,6 +47,14 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences pref = getSharedPreferences("startup", MODE_PRIVATE);
         if (pref.getString("start", "false").equals("false")) {
+            //set achievements file
+            int rawCsvId = R.raw.lockedachievements;
+            String internalFilename = "lockedachievements.csv";
+            try {
+                new AchievementEdit(this).copyCsvFromRawToInternalStorage(this, rawCsvId, internalFilename);
+            } catch (IOException e) {
+                System.out.println(e.getCause());
+            }
 
         Dialog onboardingDialog = new Dialog(this);
         onboardingDialog.setContentView(R.layout.dialog_onboarding);
@@ -54,6 +66,10 @@ public class MainActivity extends AppCompatActivity {
 
 
                 pref.edit().putString("start", "true").apply();
+                new Alarmsandnotifcation().alarmcreator(v.getContext(),12,30);
+                SharedPreferences notifcationPrefrences=v.getContext().getSharedPreferences("notifactionPrefrences", Context.MODE_PRIVATE);
+                notifcationPrefrences.edit().putInt("timeHour",12).putInt("timeMin",30).apply();
+                setNotifcationPrompts();
                 onboardingDialog.dismiss();
 
 
@@ -105,41 +121,24 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        // Set the time to trigger the alarm (e.g., 6 pm every day)
-        Calendar calendar = Calendar.getInstance();
-        //calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.add(Calendar.SECOND, 2);
-
-        // Create a pending intent to trigger the service
-        Intent intent = new Intent(this, NotifyReceiver.class);
-
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
-
-        // Get the alarm manager and schedule the periodic alarm
-        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),pendingIntent);
-
-       //alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-         //AlarmManager.INTERVAL_FIFTEEN_MINUTES, pendingIntent);
-
-
-
-
-        // Set a window of 2 hours (2pm to 4pm)
-        //long lasttime=2 * 60 * 60 * 1000;
-        //alarmManager.setWindow(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),lasttime, pendingIntent);
-        Toast.makeText(this, "Starting Service Alarm", Toast.LENGTH_LONG).show();
-
-
-
+        new Alarmsandnotifcation().alarmcreator(this,12,30);
         scheduleJob();
 
 
+    }
 
+    private void setNotifcationPrompts() {
+        // Create an instance of PromptEvaluator
+        String[] prompts = {"lets get moving",
+                "go move about",
+                "lets do 15 mins of walking"};
+        PromptEvaluator promptEvaluator = new PromptEvaluator(this);
 
-
-        System.out.println("here");
-
+        for (int i = 0; i < prompts.length; i++) {
+            String prompt = prompts[i];
+            promptEvaluator.evaluatePrompt(prompt,true);
+            promptEvaluator.evaluatePrompt(prompt,false);
+        }
     }
 
     private void scheduleJob() {
@@ -147,16 +146,10 @@ public class MainActivity extends AppCompatActivity {
         ComponentName componentName = new ComponentName(this, DailyUpdate.class);
 
         // Set the conditions under which the job should run.
-        //JobInfo jobInfo = new JobInfo.Builder(1, componentName)
-        //        .setRequiresCharging(true)
-        //        .setRequiresDeviceIdle(true)
-        //        .setPeriodic(AlarmManager.INTERVAL_DAY)
-        //        .setPersisted(true)
-        //        .build();
-
-        // Set the conditions under which the job should run.
         JobInfo jobInfo = new JobInfo.Builder(1, componentName)
-                .setMinimumLatency(100)
+                .setRequiresCharging(true)
+                .setRequiresDeviceIdle(true)
+                .setPeriodic(AlarmManager.INTERVAL_DAY)
                 .setPersisted(true)
                 .build();
 

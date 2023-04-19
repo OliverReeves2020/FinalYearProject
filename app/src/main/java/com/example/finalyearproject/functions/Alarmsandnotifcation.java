@@ -31,7 +31,7 @@ public class Alarmsandnotifcation {
         //notify receiver class handles if a notification can be created
         alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
                 AlarmManager.INTERVAL_DAY, pendingIntent);
-        alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),pendingIntent);
+        //alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, 2,pendingIntent);
 
 
     }

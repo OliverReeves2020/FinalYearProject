@@ -1,29 +1,36 @@
 package com.example.finalyearproject.ui.main;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.graphics.RenderEffect;
-import android.graphics.Shader;
-import android.graphics.drawable.AnimationDrawable;
-import android.os.Build;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.finalyearproject.R;
 import com.example.finalyearproject.databinding.FragmentMainBinding;
+import com.example.finalyearproject.datatypes.AchievementData;
+
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -60,8 +67,7 @@ public class PlaceholderFragment extends Fragment implements SharedPreferences.O
 
         // Get a reference to the shared preferences
 
-        SharedPreferences sharedPreferences= requireContext().getSharedPreferences("UserStats", Context.MODE_PRIVATE);
-
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("UserStats", Context.MODE_PRIVATE);
 
 
         // Create a listener for preference changes
@@ -74,6 +80,10 @@ public class PlaceholderFragment extends Fragment implements SharedPreferences.O
                 int progress = sharedPreferences.getInt("dailyAmount", 0);
                 progressBar.setProgress(progress);
 
+                progressBar = requireView().findViewById(R.id.progressBar4);
+                progressBar.setProgress(sharedPreferences.getInt("CurrentAchieves", 0));
+                progressBar.setMax(sharedPreferences.getInt("MaxAchieves", 0));
+
                 setStreakIconandText();
             }
         };
@@ -82,17 +92,12 @@ public class PlaceholderFragment extends Fragment implements SharedPreferences.O
         sharedPreferences.registerOnSharedPreferenceChangeListener(preferenceChangeListener);
 
 
-
-
     }
 
     @Override
     public View onCreateView(
             @NonNull LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
-
-
-
 
 
         binding = FragmentMainBinding.inflate(inflater, container, false);
@@ -104,42 +109,141 @@ public class PlaceholderFragment extends Fragment implements SharedPreferences.O
         super.onViewCreated(view, savedInstanceState);
 
 
-       //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-       //    view.findViewWithTag("blur").setRenderEffect(RenderEffect.createBlurEffect(20,20, Shader.TileMode.DECAL));
-       //    view.findViewWithTag("blur").setOutlineAmbientShadowColor(Color.argb(40,00,00,00));
-       //}
+        //if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        //    view.findViewWithTag("blur").setRenderEffect(RenderEffect.createBlurEffect(20,20, Shader.TileMode.DECAL));
+        //    view.findViewWithTag("blur").setOutlineAmbientShadowColor(Color.argb(40,00,00,00));
+        //}
         setStreakIconandText();
         updatebar(view);
 
-
-
-
-
+        //set achievements up
+        achievementSetup(view);
 
 
     }
 
+    private void achievementSetup(@NonNull View view) {
+
+        //creates a table full of achievement buttons based on read date from a csv file
+        TableLayout buttonsTableLayout = view.findViewById(R.id.buttonsTableLayout);
+
+        List<AchievementData> achievementDataList = loadButtonDataFromCsv(requireContext(),"achievements.csv");
+
+        int rowCount = 3; // Number of rows in the table
+        int colCount = (int) Math.ceil((double) achievementDataList.size() / rowCount); // Number of columns in the table
+        int badgecount=0;
+        for (int i = 0; i < rowCount; i++) {
+            TableRow row = new TableRow(requireContext());
+
+            for (int j = 0; j < colCount; j++) {
+                int index = i * colCount + j;
+                if (index >= achievementDataList.size()) {
+                    break;
+                }
+                badgecount+=1;
+
+                Button button = new Button(requireContext());
+                button.setBackground(requireContext().getDrawable(R.drawable.badge));
+                button.setWidth(50);
+                button.setHeight(50);
+                button.setGravity(1);
+                Drawable background = button.getBackground();
+
+
+                AchievementData achievementData = achievementDataList.get(index);
+                try{
+                background.setTint(Color.parseColor(achievementData.getIconUrl()));} catch (
+                        Exception e) {
+                    background.setTint(Color.BLUE);
+                }
+
+                button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        showPopup(achievementData.getDescription(),achievementData.getText());
+                    }
+                });
+                TableRow.LayoutParams layoutParams = new TableRow.LayoutParams();
+
+                button.setLayoutParams(layoutParams);
+                row.addView(button);
+
+            }
+            TableLayout.LayoutParams lp =new TableLayout.LayoutParams(TableLayout.LayoutParams.MATCH_PARENT,
+                    TableLayout.LayoutParams.WRAP_CONTENT);
+            if(i==1){
+            lp.setMargins(80,10,10,10);}
+            else{
+                lp.setMargins(10,10,10,10);
+            }
+            row.setLayoutParams(lp);
+            buttonsTableLayout.addView(row,lp);
+        }
+
+        requireContext().getSharedPreferences("UserStats",Context.MODE_PRIVATE).edit().putInt("CurrentAchieves",badgecount).commit();
+
+    }
+
+    private void showPopup(String popupText,String popupTitle) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle(popupTitle);
+        builder.setMessage(popupText);
+        builder.show();
+    }
+
+
+    public List<AchievementData> loadButtonDataFromCsv(Context context, String filename) {
+        List<AchievementData> achievementDataList = new ArrayList<>();
+
+        try {
+
+            FileInputStream inputStream = context.openFileInput(filename);
+            InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+            BufferedReader reader = new BufferedReader(inputStreamReader);
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+                String[] data = line.split(",");
+                String achieveText = data[0];
+                String achieveIconUrl = data[1];
+                String achieveDescription = data[2];
+
+                AchievementData achievementData = new AchievementData(achieveText, achieveIconUrl,achieveDescription);
+                achievementDataList.add(achievementData);
+            }
+
+            reader.close();
+            inputStreamReader.close();
+            inputStream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return achievementDataList;
+    }
+
+
     private void setStreakIconandText() {
-        SharedPreferences sharedPreferences1 =requireContext().getSharedPreferences("UserStats",Context.MODE_PRIVATE);
-        if((sharedPreferences1.getInt("highestStreak",0)<=sharedPreferences1.getInt("currentStreak",0))
-                &&sharedPreferences1.getInt("currentStreak",0)>0){
-            System.out.println("-->--");
+        SharedPreferences sharedPreferences1 = requireContext().getSharedPreferences("UserStats", Context.MODE_PRIVATE);
+        if ((sharedPreferences1.getInt("highestStreak", 0) <= sharedPreferences1.getInt("currentStreak", 0))
+                && sharedPreferences1.getInt("currentStreak", 0) > 0) {
             requireView().findViewById(R.id.streakicon).setVisibility(View.VISIBLE);
 
+        } else {
+            requireView().findViewById(R.id.streakicon).setVisibility(View.INVISIBLE);
         }
-        else{requireView().findViewById(R.id.streakicon).setVisibility(View.INVISIBLE);}
     }
 
     private void updatebar(@NonNull View view) {
-        SharedPreferences sharedPreferences= requireContext().getSharedPreferences("UserStats", Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("UserStats", Context.MODE_PRIVATE);
         ProgressBar progressBar;
 
         TextView textView;
 
         //set main goal
-        int totalDays=sharedPreferences.getInt("totalDays", 0);
-        TextView txt=view.findViewById(R.id.CurrentProgressText);
-        if(txt.getText().toString().equals(totalDays + " Days")||txt.getText().equals("")) {
+        int totalDays = sharedPreferences.getInt("totalDays", 0);
+        TextView txt = view.findViewById(R.id.CurrentProgressText);
+        if (txt.getText().toString().equals(totalDays + " Days") || txt.getText().equals("")) {
             int maxDays = getNextMultipleOfSeven(totalDays);
             //get current main goal progress bar
             progressBar = view.findViewById(R.id.MainGoal);
@@ -160,12 +264,16 @@ public class PlaceholderFragment extends Fragment implements SharedPreferences.O
 
         //set progress bar
         progressBar = view.findViewById(R.id.progressBar2);
-        setbar(view,progressBar,"dailyAmount");
+        setbar(view, progressBar, "dailyAmount");
 
         //set streak bar
         progressBar = view.findViewById(R.id.streakProgressBar);
-        setbarmax(view,progressBar,"highestStreak","currentStreak");
-        setbar(view,progressBar,"currentStreak");
+        setbarmax(view, progressBar, "highestStreak", "currentStreak");
+        setbar(view, progressBar, "currentStreak");
+
+        progressBar = requireView().findViewById(R.id.progressBar4);
+        progressBar.setProgress(sharedPreferences.getInt("CurrentAchieves", 0));
+        progressBar.setMax(sharedPreferences.getInt("MaxAchieves", 0));
 
     }
 
@@ -179,47 +287,48 @@ public class PlaceholderFragment extends Fragment implements SharedPreferences.O
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-        System.out.println("xxxxx"+key);
-            if (key.equals("UserStats")) {
-                //SharedPreferences UserStats = context.getSharedPreferences("UserStats", Context.MODE_PRIVATE);
-                // Update the progress bar with the new value
-                System.out.println("xxxxx");
-                updatebar(requireView());
-                SharedPreferences sharedPref= requireContext().getSharedPreferences("UserStats", Context.MODE_PRIVATE);
+        System.out.println("xxxxx" + key);
+        if (key.equals("UserStats")) {
+            //SharedPreferences UserStats = context.getSharedPreferences("UserStats", Context.MODE_PRIVATE);
+            // Update the progress bar with the new value
+            System.out.println("xxxxx");
+            updatebar(requireView());
+            SharedPreferences sharedPref = requireContext().getSharedPreferences("UserStats", Context.MODE_PRIVATE);
 
-                System.out.println("-->--"+sharedPref.getInt("highestStreak",0)+sharedPreferences.getInt("currentStreak",0));
-                if((sharedPreferences.getInt("highestStreak",0)<=sharedPreferences.getInt("currentStreak",0))
-                        &&sharedPreferences.getInt("currentStreak",0)>0){
-                    System.out.println("-->--");
-                    requireView().findViewById(R.id.streakicon).setVisibility(View.VISIBLE);
-
-                }
+            System.out.println("-->--" + sharedPref.getInt("highestStreak", 0) + sharedPreferences.getInt("currentStreak", 0));
+            if ((sharedPreferences.getInt("highestStreak", 0) <= sharedPreferences.getInt("currentStreak", 0))
+                    && sharedPreferences.getInt("currentStreak", 0) > 0) {
+                System.out.println("-->--");
+                requireView().findViewById(R.id.streakicon).setVisibility(View.VISIBLE);
 
             }
 
+        }
+
     }
 
 
-    private void setbar(View view,ProgressBar progressBar, String key){
+    private void setbar(View view, ProgressBar progressBar, String key) {
 
-        SharedPreferences sharedPreferences= requireContext().getSharedPreferences("UserStats", Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("UserStats", Context.MODE_PRIVATE);
         int progress = sharedPreferences.getInt(key, 0);
         progressBar.setProgress(progress);
     }
-    private void setbarmax(View view,ProgressBar progressBar, String key,String backup){
 
-        SharedPreferences sharedPreferences= requireContext().getSharedPreferences("UserStats", Context.MODE_PRIVATE);
+    private void setbarmax(View view, ProgressBar progressBar, String key, String backup) {
+
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("UserStats", Context.MODE_PRIVATE);
         int progress = sharedPreferences.getInt(key, 0);
-        if (progress==0){
+        if (progress == 0) {
             progressBar.setMax(sharedPreferences.getInt(backup, 1));
-        }
-        else{
+        } else {
             progressBar.setMax(progress);
         }
 
     }
-    private void setTxt(View view,TextView textView, String key){
-        SharedPreferences sharedPreferences= requireContext().getSharedPreferences("UserStats", Context.MODE_PRIVATE);
+
+    private void setTxt(View view, TextView textView, String key) {
+        SharedPreferences sharedPreferences = requireContext().getSharedPreferences("UserStats", Context.MODE_PRIVATE);
         String txt = String.valueOf(sharedPreferences.getInt(key, 0));
         textView.setText(txt);
     }
@@ -237,8 +346,6 @@ public class PlaceholderFragment extends Fragment implements SharedPreferences.O
             return x + 7 - remainder;
         }
     }
-
-
 
 
 }

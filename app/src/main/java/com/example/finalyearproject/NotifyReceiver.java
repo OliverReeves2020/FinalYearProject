@@ -23,6 +23,7 @@ import androidx.preference.PreferenceManager;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -43,18 +44,26 @@ public class NotifyReceiver extends BroadcastReceiver {
 
 
         //load notifcation prefrences
+        Set<String> SelectedDays = new HashSet<String>();
+        SelectedDays.add("Monday");
+        SelectedDays.add("Tuesday");
+        SelectedDays.add("Wednesday");
+        SelectedDays.add("Thursday");
+        SelectedDays.add("Friday");
+        SelectedDays.add("Saturday");
+        SelectedDays.add("Sunday");
         SharedPreferences notifcationPrefs = context.getSharedPreferences("notifactionPrefrences", Context.MODE_PRIVATE);
-        Set<String> selectedDays = notifcationPrefs.getStringSet("selectedDays", null);
+        Set<String> selectedDays = notifcationPrefs.getStringSet("selectedDays", SelectedDays);
 
         //check that notifaction is allowed today
         SimpleDateFormat f = new SimpleDateFormat("EEEE");
-        System.out.println(selectedDays);
+        System.out.println("-->"+selectedDays);
         if (selectedDays.contains(f.format(new Date()))) {
 
 
         boolean Silence = notifcationPrefs.getBoolean("Silence", false);
-        String Title = notifcationPrefs.getString("Title", "basictitle");
-        String Text = notifcationPrefs.getString("Text", "basictext");
+        String Title = notifcationPrefs.getString("Title", "FYP");
+        String Text = notifcationPrefs.getString("Text", "shall we go for a walk");
         String yesAction = notifcationPrefs.getString("yesAction", "yes");
         String noAction = notifcationPrefs.getString("noAction", "maybe later");
 

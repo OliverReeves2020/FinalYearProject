@@ -83,6 +83,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"
                     android:orientation="vertical">
 
                     <TextView
@@ -142,76 +143,25 @@
 
         <FrameLayout
             style="@style/glassbg"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <HorizontalScrollView
                 android:id="@+id/horizontalScrollView"
-                android:layout_width="409dp"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:padding="10dp"
-                android:tag="blur"
                 app:cardElevation="8dp"
                 app:cardUseCompatPadding="true">
 
                 <TableLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent">
+                    android:id="@+id/buttonsTableLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    >
 
-                    <TableRow
-                        android:id="@+id/topRow"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
+                    <!-- Table rows and columns will be added programmatically -->
 
-                        <Button
-                            android:id="@+id/button"
-                            android:layout_width="200dp"
-                            android:layout_height="wrap_content"
-                            android:text="Button" />
-
-                        <Button
-                            android:id="@+id/button2"
-                            android:layout_width="200dp"
-                            android:layout_height="wrap_content"
-                            android:text="Button" />
-                    </TableRow>
-
-                    <TableRow
-                        android:id="@+id/middleRow"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginLeft="100dp">
-
-                        <Button
-                            android:id="@+id/button3"
-                            android:layout_width="200dp"
-                            android:layout_height="wrap_content"
-                            android:text="Button" />
-
-                        <Button
-                            android:id="@+id/button6"
-                            android:layout_width="200dp"
-                            android:layout_height="wrap_content"
-                            android:text="Button" />
-
-                        <Button
-                            android:id="@+id/button7"
-                            android:layout_width="200dp"
-                            android:layout_height="wrap_content"
-                            android:text="Button" />
-                    </TableRow>
-
-                    <TableRow
-                        android:id="@+id/bottomRow"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent">
-
-                        <Button
-                            android:id="@+id/button5"
-                            android:layout_width="200dp"
-                            android:layout_height="wrap_content"
-                            android:text="Buttonm" />
-                    </TableRow>
                 </TableLayout>
             </HorizontalScrollView>
         </FrameLayout>
