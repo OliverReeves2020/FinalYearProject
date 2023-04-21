@@ -1,3 +1,7 @@
+/**
+ * The PromptEvaluator class is used to evaluate user prompts and calculate their NPS score based on
+ * positive and negative responses.
+ */
 package com.example.finalyearproject.database;
 
 import android.content.ContentValues;

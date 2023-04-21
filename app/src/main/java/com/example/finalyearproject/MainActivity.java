@@ -70,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
                 SharedPreferences notifcationPrefrences=v.getContext().getSharedPreferences("notifactionPrefrences", Context.MODE_PRIVATE);
                 notifcationPrefrences.edit().putInt("timeHour",12).putInt("timeMin",30).apply();
                 setNotifcationPrompts();
+                scheduleJob();
                 onboardingDialog.dismiss();
 
 
@@ -119,10 +120,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-
-
-        new Alarmsandnotifcation().alarmcreator(this,12,30);
-        scheduleJob();
 
 
     }
